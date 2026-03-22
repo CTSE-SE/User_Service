@@ -1,0 +1,33 @@
+name: User Service CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check app starts
+        run: |
+          npm start &
+          sleep 10
+          curl -f http://localhost:3002/health || exit 1
+
+      - name: Build Docker image
+        run: docker build -t user-service .

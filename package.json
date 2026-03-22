@@ -1,5 +1,5 @@
 {
-  "name": "user-service",
+  "name": "User-Service",
   "version": "1.0.0",
   "description": "Authentication and Authorization service for Food Ordering System",
   "type": "module",

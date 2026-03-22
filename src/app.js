@@ -21,7 +21,7 @@ app.use(express.json());
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "UP",
-    service: "user-service",
+    service: "User-Service",
     timestamp: new Date().toISOString()
   });
 });
