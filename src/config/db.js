@@ -1,13 +1,20 @@
-import mongoose from "mongoose";
+import "dotenv/config";
+import { Sequelize } from "sequelize";
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error("Database connection failed:", error.message);
-    process.exit(1);
+console.log("DB_NAME:", process.env.DB_NAME);
+console.log("DB_USER:", process.env.DB_USER);
+console.log("DB_PASSWORD loaded:", typeof process.env.DB_PASSWORD);
+
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    dialect: "postgres",
+    logging: false
   }
-};
+);
 
-export default connectDB;
+export default sequelize;

@@ -4,7 +4,8 @@ import {
   loginUser,
   getProfile,
   updateProfile,
-  checkUserExists
+  checkUserExists,
+  validateToken
 } from "../controllers/userController.js";
 import protect from "../middleware/authMiddleware.js";
 import {
@@ -20,5 +21,6 @@ router.post("/login", loginValidation, loginUser);
 router.get("/profile", protect, getProfile);
 router.put("/profile", protect, updateProfileValidation, updateProfile);
 router.get("/exists/:id", checkUserExists);
+router.get("/auth/validate", protect, validateToken);
 
 export default router;

@@ -1,0 +1,87 @@
+name: User Service CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: user_service_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d user_service_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      PORT: 3002
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: user_service_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: test_jwt_secret_key
+      JWT_EXPIRES_IN: 1d
+      CLIENT_URL: http://localhost:5173
+      INTERNAL_API_KEY: test_internal_api_key
+      API_BASE_URL: http://localhost:3002
+      LOG_LEVEL: info
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..20}; do
+            nc -z localhost 5432 && echo "PostgreSQL is up" && exit 0
+            echo "Waiting for PostgreSQL..."
+            sleep 3
+          done
+          echo "PostgreSQL did not start in time"
+          exit 1
+
+      - name: Start app
+        run: |
+          npm start > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Wait for app startup
+        run: sleep 15
+
+      - name: Check health endpoint
+        run: curl -f http://localhost:3002/health
+
+      - name: Stop app
+        if: always()
+        run: |
+          if [ -f app.pid ]; then kill $(cat app.pid) || true; fi
+
+      - name: Show app logs if failed
+        if: failure()
+        run: cat app.log || true
+
+      - name: Build Docker image
+        run: docker build -t user-service .
