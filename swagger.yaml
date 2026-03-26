@@ -6,6 +6,9 @@ info:
 
 servers:
   - url: http://localhost:3002
+    description: Local development
+  - url: http://shopapp-alb-1013507396.ap-southeast-1.elb.amazonaws.com
+    description: AWS Production
 
 tags:
   - name: Health
