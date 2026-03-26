@@ -8,7 +8,12 @@ import userRoutes from "./routes/userRoutes.js";
 const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+  })
+);
 app.use(
   cors({
     origin: [process.env.CLIENT_URL || "http://localhost:3000"],
@@ -31,6 +36,7 @@ app.get("/api/users/health", (req, res) => {
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api/users/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
