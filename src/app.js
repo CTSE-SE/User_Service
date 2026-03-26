@@ -26,6 +26,10 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/api/users/health", (req, res) => {
+  res.json({ success: true, service: "user-service", status: "healthy", timestamp: new Date().toISOString() });
+});
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/users", userRoutes);
 
