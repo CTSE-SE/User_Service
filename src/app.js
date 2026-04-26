@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import userRoutes from "./routes/userRoutes.js";
 
+//test
 const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
